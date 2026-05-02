@@ -1,0 +1,32 @@
+name: Build_Dino_APK
+on: [push] # Запуск при каждом git push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant Execute Permission
+        run: chmod +x gradlew || true # Если файла нет, не паникуем
+
+      - name: Create Gradle Wrapper
+        run: gradle wrapper --gradle-version 8.1.1 # Генерируем загрузчик прямо на сервере
+
+      - name: Build with Gradle
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Dino-Game-Build
+          path: app/build/outputs/apk/debug/*.apk
+
